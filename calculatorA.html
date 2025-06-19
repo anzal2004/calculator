@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      margin: 0;
+      background: #f4f4f4;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      max-width: 800px;
+      width: 100%;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .calculator {
+      flex: 1;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+    }
+    .history {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .display {
+      width: 100%;
+      font-size: 2em;
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: right;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      padding: 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    .history h2 {
+      margin-top: 0;
+    }
+    .history-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    @media (max-width: 600px) {
+      .container {
+        flex-direction: column;
+      }
+      .calculator {
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="calculator">
+      <div id="display" class="display"></div>
+      <div class="buttons">
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button onclick="append('/')">÷</button>
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button onclick="append('*')">×</button>
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button onclick="append('-')">−</button>
+        <button onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button onclick="calculate()">=</button>
+        <button onclick="append('+')">+</button>
+        <button onclick="clearDisplay()" style="grid-column: span 4; background: #f44336; color: white;">C</button>
+      </div>
+    </div>
+    <div class="history">
+      <h2>History</h2>
+      <ul id="historyList" class="history-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+    const historyList = document.getElementById('historyList');
+
+    let input = '';
+
+    function append(char) {
+      input += char;
+      display.textContent = input;
+    }
+
+    function clearDisplay() {
+      input = '';
+      display.textContent = '';
+    }
+
+    function calculate() {
+      try {
+        const result = eval(input);
+        display.textContent = result;
+        saveToHistory(`${input} = ${result}`);
+        input = result.toString();
+      } catch (e) {
+        display.textContent = 'Error';
+        input = '';
+      }
+    }
+
+    function saveToHistory(entry) {
+      let history = JSON.parse(localStorage.getItem('calcHistory')) || [];
+      history.unshift(entry);
+      localStorage.setItem('calcHistory', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      let history = JSON.parse(localStorage.getItem('calcHistory')) || [];
+      historyList.innerHTML = '';
+      history.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        historyList.appendChild(li);
+      });
+    }
+
+    // Load history on page load
+    window.onload = renderHistory;
+  </script>
+</body>
+</html>
